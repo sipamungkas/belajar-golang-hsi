@@ -1,0 +1,3 @@
+✅ Go Version: go version go1.24.2 darwin/arm64
+✅ Git Version: git version 2.39.5 (Apple Git-154)
+✅ OS yang digunakan: macOS
