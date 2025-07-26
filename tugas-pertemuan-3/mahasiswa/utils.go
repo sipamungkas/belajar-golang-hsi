@@ -46,10 +46,10 @@ func GetMaxNilai() int {
 	return maxNilai
 }
 
-func TotalAge(age ...int) int {
+func TotalAge() func(age int) int {
 	result := 0
-	for _, v := range age {
-		result += v
+	return func(age int) int {
+		result += age
+		return result
 	}
-	return result
 }

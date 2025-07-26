@@ -17,10 +17,10 @@ func main() {
 	//
 	students := []*mahasiswa.Mahasiswa{m1, m2}
 
-	var ages []int
+	totalAge := mahasiswa.TotalAge()
 
 	for _, val := range students {
-		ages = append(ages, val.GetUmur())
+		totalAge(val.GetUmur())
 		fmt.Println(val.Info())
 		fmt.Printf("Rata-rata nilai: %v\n", val.RataRata())
 		fmt.Println("---")
@@ -28,6 +28,6 @@ func main() {
 
 	fmt.Printf("Versi Package: %v\n", mahasiswa.Versi)
 	fmt.Printf("Nilai Maksimum: %v\n", mahasiswa.GetMaxNilai())
-	fmt.Printf("Total Umur Mahasiswa: %v\n", mahasiswa.TotalAge(ages...))
+	fmt.Printf("Total Umur Mahasiswa: %v\n", totalAge(0))
 
 }
