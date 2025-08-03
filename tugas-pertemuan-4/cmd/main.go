@@ -65,6 +65,7 @@ func main() {
 
 	var wg sync.WaitGroup
 	msgChan := make(chan string, 5)
+	taskChan := make(chan string, 5)
 
 	for _, student := range students {
 		wg.Add(1)
@@ -73,6 +74,21 @@ func main() {
 
 	for range students {
 		fmt.Println(<-msgChan)
+	}
+
+	var tasks []models.Tugas
+	result := db.Preload("Mahasiswa").Find(&tasks).Where("Nilai IS NOT NULL")
+
+	if result.Error != nil {
+		log.Fatal("Error when accesing database")
+	}
+
+	for _, task := range tasks {
+		go worker.GradingWorker(db, task, taskChan)
+	}
+
+	for range tasks {
+		fmt.Println(<-taskChan)
 	}
 
 }
