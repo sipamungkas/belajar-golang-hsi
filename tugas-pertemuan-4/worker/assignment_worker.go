@@ -3,6 +3,7 @@ package worker
 import (
 	"fmt"
 	"math/rand"
+	"sync"
 	"tugas-pertemuan-4/models"
 
 	"gorm.io/gorm"
@@ -19,7 +20,8 @@ var taskList []string = []string{
 // 	return append(s[:index], s[index+1:]...)
 // }
 
-func AssignmentWorker(db *gorm.DB, student models.Mahasiswa, msgChan chan<- string) {
+func AssignmentWorker(db *gorm.DB, student models.Mahasiswa, msgChan chan<- string, wg *sync.WaitGroup) {
+	defer wg.Done()
 
 	taskCount := len(taskList)
 

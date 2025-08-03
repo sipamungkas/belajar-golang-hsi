@@ -64,12 +64,13 @@ func main() {
 	}
 
 	var wg sync.WaitGroup
+
 	msgChan := make(chan string, 5)
 	taskChan := make(chan string, 5)
 
 	for _, student := range students {
 		wg.Add(1)
-		go worker.AssignmentWorker(db, student, msgChan)
+		go worker.AssignmentWorker(db, student, msgChan, &wg)
 	}
 
 	for range students {
@@ -77,18 +78,34 @@ func main() {
 	}
 
 	var tasks []models.Tugas
+
 	result := db.Preload("Mahasiswa").Find(&tasks).Where("Nilai IS NOT NULL")
 
 	if result.Error != nil {
 		log.Fatal("Error when accesing database")
 	}
 
-	for _, task := range tasks {
-		go worker.GradingWorker(db, task, taskChan)
+	if len(tasks) > 0 {
+		for _, task := range tasks {
+			wg.Add(1)
+
+			go worker.GradingWorker(db, task, taskChan, &wg)
+		}
+
+		for range tasks {
+			fmt.Println(<-taskChan)
+		}
 	}
 
-	for range tasks {
-		fmt.Println(<-taskChan)
+	query := db.Preload("Tugas").Find(&students)
+	if query.Error != nil {
+		log.Println("Error when getting final students")
 	}
 
+	fmt.Println("Hasil Tugas Mahasiswa:")
+	for _, student := range students {
+		fmt.Printf("%s - %s: %v\n", student.Nama, student.Tugas[len(student.Tugas)-1].Judul, student.Tugas[len(student.Tugas)-1].Deskripsi)
+	}
+
+	wg.Wait()
 }
