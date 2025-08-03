@@ -32,6 +32,7 @@ func main() {
 	// migration
 	db.AutoMigrate(models.Mahasiswa{})
 	db.AutoMigrate(models.Tugas{})
+	db.AutoMigrate(models.Hasil{})
 
 	db.Create(&models.Mahasiswa{Nama: "Ragil"})
 }
