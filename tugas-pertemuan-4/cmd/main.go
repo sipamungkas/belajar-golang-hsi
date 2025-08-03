@@ -3,8 +3,10 @@ package main
 import (
 	"fmt"
 	"log"
+	"sync"
 	"tugas-pertemuan-4/config"
 	"tugas-pertemuan-4/models"
+	"tugas-pertemuan-4/worker"
 
 	"github.com/joho/godotenv"
 	"gorm.io/driver/postgres"
@@ -34,5 +36,43 @@ func main() {
 	db.AutoMigrate(models.Tugas{})
 	db.AutoMigrate(models.Hasil{})
 
-	db.Create(&models.Mahasiswa{Nama: "Ragil"})
+	var count int64
+
+	// Counting students
+	db.Model(&models.Mahasiswa{}).Count(&count)
+	log.Println("Current students: ", count)
+	// check table count
+	if count < 1 {
+		newStudents := []*models.Mahasiswa{
+			{Nama: "Ragil"},
+			{Nama: "Burhan"},
+			{Nama: "Udin"},
+			{Nama: "Pamung"},
+			{Nama: "Ragil P"},
+		}
+		res := db.Create(newStudents)
+
+		var insertedCount int64
+		res.Count(&insertedCount)
+		log.Println(insertedCount, "Students Successfully added to table mahasiswa")
+	}
+
+	var students []models.Mahasiswa
+	res := db.Find(&students)
+	if res.Error != nil {
+		log.Fatal(err)
+	}
+
+	var wg sync.WaitGroup
+	msgChan := make(chan string, 5)
+
+	for _, student := range students {
+		wg.Add(1)
+		go worker.AssignmentWorker(db, student, msgChan)
+	}
+
+	for range students {
+		fmt.Println(<-msgChan)
+	}
+
 }
