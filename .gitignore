@@ -1,0 +1,6 @@
+# ignore .env
+.env
+.env*
+
+# to always include .env.example
+!.env.example
