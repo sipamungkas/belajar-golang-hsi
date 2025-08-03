@@ -5,6 +5,7 @@ import "time"
 type Mahasiswa struct {
 	ID        uint   `gorm:"primaryKey"`
 	Nama      string `gorm:"type:varchar(255);not null"`
+	Tugas     []Tugas
 	CreatedAt time.Time
 	UpdatedAt time.Time
 }
